@@ -1,0 +1,13 @@
+fastapi[standard]
+pydantic
+pydantic-settings
+celery
+redis
+duckdb
+sqlalchemy
+langchain
+langchain-openai
+openai
+python-multipart
+pytest
+httpx
