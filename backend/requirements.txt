@@ -6,8 +6,7 @@ redis
 duckdb
 sqlalchemy
 langchain
-langchain-openai
-openai
+langchain-google-genai
 python-multipart
 pytest
 httpx

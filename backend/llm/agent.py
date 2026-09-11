@@ -1,4 +1,4 @@
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from core.config import settings
 from analytics.engine import AnalyticsEngine
@@ -9,8 +9,8 @@ class DataAgent:
         self.dataset_id = dataset_id
         self.schema_info = schema_info
         self.engine = AnalyticsEngine(dataset_id=dataset_id)
-        # Using gpt-4o for best SQL generation capabilities
-        self.llm = ChatOpenAI(api_key=settings.OPENAI_API_KEY, model="gpt-4o", temperature=0)
+        # Using gemini-3.5-flash to avoid Free Tier Quota limits on Pro models
+        self.llm = ChatGoogleGenerativeAI(api_key=settings.GEMINI_API_KEY, model="gemini-3.5-flash", temperature=0)
         
     def _format_schema_context(self):
         context = f"Table name: {self.schema_info['table_name']}\n"
@@ -43,7 +43,13 @@ Schema Context:
             "question": question
         })
         
-        sql = response.content.strip()
+        content = response.content
+        if isinstance(content, list):
+            sql = content[0].get("text", "") if isinstance(content[0], dict) else str(content[0])
+        else:
+            sql = content
+            
+        sql = sql.strip()
         if sql.startswith("```sql"):
             sql = sql[6:]
         if sql.startswith("```"):
@@ -72,7 +78,13 @@ CRITICAL RULES:
             "results": json.dumps(results, indent=2)
         })
         
-        return response.content.strip()
+        content = response.content
+        if isinstance(content, list):
+            ans = content[0].get("text", "") if isinstance(content[0], dict) else str(content[0])
+        else:
+            ans = content
+            
+        return ans.strip()
 
     def answer(self, question: str):
         sql = self.generate_sql(question)

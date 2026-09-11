@@ -21,6 +21,7 @@ services:
       - DATABASE_URL=sqlite:////app/data/metadata.db
       - DUCKDB_PATH=/app/data/analytics.duckdb
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     env_file:
       - .env
     depends_on:
@@ -40,6 +41,7 @@ services:
       - DATABASE_URL=sqlite:////app/data/metadata.db
       - DUCKDB_PATH=/app/data/analytics.duckdb
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     env_file:
       - .env
     depends_on:

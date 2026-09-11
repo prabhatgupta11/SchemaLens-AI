@@ -8,5 +8,6 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./metadata.db")
     DUCKDB_PATH: str = os.getenv("DUCKDB_PATH", "./analytics.duckdb")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 
 settings = Settings()
