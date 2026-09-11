@@ -11,3 +11,4 @@ openai
 python-multipart
 pytest
 httpx
+pandas
