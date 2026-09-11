@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Upload, Database, MessageSquare, Send, Loader2, AlertCircle } from 'lucide-react'
+import { Upload, Database, MessageSquare, Send, Loader2, AlertCircle, Trash2 } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -116,6 +116,20 @@ function App() {
     }
   }
 
+  const handleDelete = async (datasetId, e) => {
+    e.stopPropagation()
+    try {
+      await axios.delete(`${API_URL}/datasets/${datasetId}`)
+      if (selectedDataset && selectedDataset.id === datasetId) {
+        setSelectedDataset(null)
+        setMessages([])
+      }
+      fetchDatasets()
+    } catch (err) {
+      console.error("Failed to delete dataset", err)
+    }
+  }
+
   return (
     <div className="flex h-screen bg-neutral-900 text-neutral-100 font-sans w-full">
       <div className="w-64 bg-neutral-950 border-r border-neutral-800 p-4 flex flex-col">
@@ -142,14 +156,22 @@ function App() {
 
           <div className="space-y-1 overflow-y-auto max-h-[50vh]">
             {datasets.map(d => (
-              <button
-                key={d.id}
-                onClick={() => setSelectedDataset(d)}
-                className={`w-full text-left p-2 rounded-md text-sm truncate flex items-center gap-2 ${selectedDataset?.id === d.id ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'}`}
-              >
-                <Database className="w-3 h-3" />
-                {d.name}
-              </button>
+              <div key={d.id} className="flex items-center gap-1 group">
+                <button
+                  onClick={() => setSelectedDataset(d)}
+                  className={`flex-1 text-left p-2 rounded-md text-sm truncate flex items-center gap-2 ${selectedDataset?.id === d.id ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'}`}
+                >
+                  <Database className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{d.name}</span>
+                </button>
+                <button 
+                  onClick={(e) => handleDelete(d.id, e)}
+                  className="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-400/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                  title="Delete dataset"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             ))}
             {datasets.length === 0 && !uploading && (
               <div className="text-neutral-500 text-sm text-center py-4">No datasets uploaded</div>

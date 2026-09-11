@@ -79,3 +79,23 @@ def submit_query(request: QueryRequest, db: Session = Depends(get_db)):
 def list_datasets(db: Session = Depends(get_db)):
     datasets = db.query(Dataset).order_by(Dataset.created_at.desc()).all()
     return [{"id": d.id, "name": d.name, "created_at": d.created_at} for d in datasets]
+
+@router.delete("/datasets/{dataset_id}")
+def delete_dataset(dataset_id: str, db: Session = Depends(get_db)):
+    dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+        
+    # Delete physical db file
+    db_path = f"/app/data/dataset_{dataset_id}.duckdb"
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        
+    # Delete jobs related to this dataset
+    db.query(Job).filter(Job.dataset_id == dataset_id).delete()
+    
+    # Delete dataset record
+    db.delete(dataset)
+    db.commit()
+    
+    return {"status": "success", "message": "Dataset deleted"}
